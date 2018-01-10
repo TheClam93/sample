@@ -1,5 +1,6 @@
 # -*- coding: cp1252 -*-
 import unittest
+<<<<<<< HEAD
 import urllib2
 
 def takeSecond(elem):
@@ -58,3 +59,6 @@ print cheaplist[0:10]
 
 
 
+=======
+gfdhfd
+>>>>>>> origin/master
