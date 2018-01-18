@@ -1,0 +1,15 @@
+MANIFEST.in
+unisport/__init__.py
+unisport/schema.sql
+unisport/unisport.py
+unisport.egg-info/PKG-INFO
+unisport.egg-info/SOURCES.txt
+unisport.egg-info/dependency_links.txt
+unisport.egg-info/requires.txt
+unisport.egg-info/top_level.txt
+unisport/static/layout.html
+unisport/static/show_entries.html
+unisport/templates/.style.css.swn
+unisport/templates/.style.css.swo
+unisport/templates/.style.css.swp
+unisport/templates/style.css

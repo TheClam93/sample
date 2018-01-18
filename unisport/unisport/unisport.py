@@ -1,8 +1,39 @@
 # all the imports
 import os
 import sqlite3
+import urllib2
+
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
+
+def takeSecond(elem):
+    return elem[1]
+
+page = urllib2.urlopen('http://www.unisport.dk/api/sample/')
+pagedata = page.read()
+
+data = pagedata.split("{")
+
+dictlist = []
+dictcount = 0
+for datapoint in data:
+    if dictcount >= 2:
+        data2 = datapoint.split("\"")
+        data2 =[e for e in data2 if e not in ('', ' ', ', ', ': ', '}, ')]
+        datadict = dict(zip(data2[::2], data2[1::2]))
+        dictlist.append(datadict)
+    dictcount = dictcount + 1
+
+cheaplist = []
+#for product in dictlist:
+#    cheaplist.append([product['name'], product['price']])
+
+cheaplist.sort(key=takeSecond)
+
+
+#Number one
+print "Cheap List"
+print cheaplist[0:10]
 
 app = Flask(__name__) # create the application instance :)
 app.config.from_object(__name__) # load config from this file , unisport.py
@@ -56,3 +87,34 @@ def products():
     cur = db.execute('select title, text from entries order by id desc')
     entries = cur.fetchall()
     return render_template('show_entries.html', entries=entries)
+
+@app.route('/add', methods=['POST'])
+def add_entry():
+    if not session.get('logged_in'):
+        abort(401)
+    db = get_db()
+    db.execute('insert into entries (title, text) values (?, ?)',
+                 [request.form['title'], request.form['text']])
+    db.commit()
+    flash('New entry was successfully posted')
+    return redirect(url_for('show_entries'))
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    error = None
+    if request.method == 'POST':
+        if request.form['username'] != app.config['USERNAME']:
+            error = 'Invalid username'
+        elif request.form['password'] != app.config['PASSWORD']:
+            error = 'Invalid password'
+        else:
+            session['logged_in'] = True
+            flash('You were logged in')
+            return redirect(url_for('add_entry'))
+    return render_template('login.html', error=error)
+
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    flash('You were logged out')
+    return redirect(url_for('show_entries'))
